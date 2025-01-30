@@ -304,3 +304,40 @@ function searchTable() {
     rows[i].style.display = rowVisible ? '' : 'none';
   }
 }
+
+
+//descargar como word
+document.getElementById('download-word').addEventListener('click', downloadWord);
+
+function downloadWord() {
+  if (selectedColumns.length === 0) {
+    alert("Selecciona al menos una columna.");
+    return;
+  }
+
+  // Prepare table data for Word document
+  let docContent = "<table border='1' cellpadding='5' cellspacing='0'>";
+  
+  // Header row
+  docContent += "<tr>";
+  selectedColumns.forEach(index => {
+    docContent += `<th>${filteredRows[0][index]}</th>`;
+  });
+  docContent += "</tr>";
+
+  // Data rows
+  filteredRows.slice(1).forEach(row => {
+    docContent += "<tr>";
+    selectedColumns.forEach(index => {
+      docContent += `<td>${row[index] || ''}</td>`;
+    });
+    docContent += "</tr>";
+  });
+
+  docContent += "</table>";
+
+  // Create a Word document and download it
+  const blob = new Blob(['\uFEFF', docContent], { type: 'application/msword' });
+  saveAs(blob, 'Datos_Filtrados.doc');
+}
+
