@@ -70,47 +70,35 @@ function updateSheetData() {
     return;
   }
 
-  // Aseguramos que todas las filas tengan el mismo número de columnas que la primera fila
-  const maxColumns = allRows[0].length; // Número máximo de columnas (basado en la primera fila)
+  const maxColumns = allRows[0].length;
 
   // Normalizamos todas las filas, asegurándonos de que cada una tenga el mismo número de columnas
   allRows = allRows.map(row => {
-    // Si una fila tiene menos columnas que la primera, las rellenamos con valores vacíos
     if (row.length < maxColumns) {
       const diff = maxColumns - row.length;
       row = [...row, ...Array(diff).fill('')]; // Rellenamos con celdas vacías
     }
 
-    // Aquí identificamos el índice de la columna "# de Formulario" (Asegúrate de que el encabezado sea correcto)
     const formColumnIndex = allRows[0].findIndex(cell => cleanString(cell) === "número de formulario");
 
-    // Reemplazar celdas vacías con "N/A" en todas las columnas, incluyendo la de "# de Formulario"
     return row.map((cell, index) => {
-      if (cell === '') {
-        return 'N/A'; // Reemplazamos los valores vacíos por 'N/A'
-      }
-      if (index === formColumnIndex && cell === '') {
-        return 'N/A'; // Reemplazamos los valores vacíos específicamente en la columna "# de Formulario"
+      // Si la celda está vacía, reemplazamos por 'N/A', pero no si es una celda con un formato diferente
+      if (cell === '' && index !== formColumnIndex) {
+        return 'N/A'; // Solo reemplazamos las celdas vacías por 'N/A' si no están en la columna "número de formulario"
       }
       return cell;
     });
   });
 
-  // Aquí estamos limpiando los encabezados de la hoja de forma similar
   const headers = allRows[0].map(header => header ? cleanString(header) : "");
-  console.log("Encabezados de la hoja: ", headers);
 
-  // Ahora buscamos la columna "Grado al que se matricula"
   gradeColumnIndex = -1;
   for (let i = 0; i < allRows.length; i++) {
     let row = allRows[i];
     let rowHeaders = row.map(cell => cleanString(cell));
 
-    console.log("Encabezados fila", i, rowHeaders);  // Ver los datos de cada fila
-
     gradeColumnIndex = rowHeaders.indexOf(cleanString("grado al que se matricula"));
     if (gradeColumnIndex !== -1) {
-      console.log(`Columna encontrada en la fila ${i}`);
       break;
     }
   }
@@ -122,6 +110,7 @@ function updateSheetData() {
   filteredRows = [...allRows];
   displayTable(filteredRows);
 }
+
 
 
 function displayTable(rows) {
